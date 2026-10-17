@@ -10,31 +10,31 @@ export class PublicacoesService {
     private readonly parceirosRepository: ParceirosRepository,
   ) {}
 
-  // 1. Criar uma publicação
-  async criar(dto: CreatePublicacaoDto) {
-    // Verificar se o parceiro existe
-    const parceiro = await this.parceirosRepository.buscarPorId(dto.parceiro_id);
+  async criar(dto: CreatePublicacaoDto, parceiroId: string) {
+    const parceiro = await this.parceirosRepository.buscarPorId(parceiroId);
     if (!parceiro) {
       throw new NotFoundException('Parceiro não encontrado.');
     }
 
-    // Verificar se o parceiro está aprovado (regra de negócio)
     if (parceiro.status !== 'aprovado') {
       throw new BadRequestException(
         `Não podes publicar. O teu estado é: ${parceiro.status}. Aguarda aprovação do Admin.`,
       );
     }
 
-    const publicacao = await this.repository.criar(dto);
+    // Passamos o parceiroId do Token para o Repository
+    const publicacao = await this.repository.criar({
+      ...dto,
+      parceiro_id: parceiroId, 
+    } as any);
+
     return publicacao;
   }
 
-  // 2. Listar o feed (apenas publicações ativas)
   async listarFeed() {
     return this.repository.listarFeed();
   }
 
-  // 3. Buscar publicação por ID
   async buscarPorId(id: string) {
     const publicacao = await this.repository.buscarPorId(id);
     if (!publicacao) {
@@ -43,7 +43,6 @@ export class PublicacoesService {
     return publicacao;
   }
 
-  // 4. Remover publicação (soft delete)
   async remover(id: string, motivo: string = 'Removido pelo autor') {
     const publicacao = await this.repository.buscarPorId(id);
     if (!publicacao) {

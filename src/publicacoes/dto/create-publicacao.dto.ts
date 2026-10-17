@@ -1,11 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreatePublicacaoDto {
-  @ApiProperty({ example: '25ccb15a-02fd-401b-9c01-ec6c140d86f8' })
-  @IsUUID()
-  @IsNotEmpty()
-  parceiro_id: string;
 
   @ApiProperty({ example: 'Prato do dia: Frango da Matola' })
   @IsString()

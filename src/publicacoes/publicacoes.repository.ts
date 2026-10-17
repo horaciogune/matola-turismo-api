@@ -7,8 +7,8 @@ import { CreatePublicacaoDto } from './dto/create-publicacao.dto.js';
 export class PublicacoesRepository {
   constructor(private readonly db: DatabaseService) {}
 
-  // 1. Criar uma publicação (O ID do parceiro vem no dto)
-  async criar(dto: CreatePublicacaoDto): Promise<Publicacao> {
+  // 1. Criar uma publicação (Recebe o DTO + parceiro_id vindo do Token)
+  async criar(dados: CreatePublicacaoDto & { parceiro_id: string }): Promise<Publicacao> {
     const sql = `
       INSERT INTO publicacoes (parceiro_id, titulo, conteudo, foto_url, status)
       VALUES ($1, $2, $3, $4, 'ativo')
@@ -16,10 +16,10 @@ export class PublicacoesRepository {
     `;
 
     const valores = [
-      dto.parceiro_id,
-      dto.titulo,
-      dto.conteudo ?? null,
-      dto.foto_url ?? null,
+      dados.parceiro_id, 
+      dados.titulo,
+      dados.conteudo ?? null,
+      dados.foto_url ?? null,
     ];
 
     const result = await this.db.query<Publicacao>(sql, valores);
